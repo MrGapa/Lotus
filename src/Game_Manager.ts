@@ -2,6 +2,8 @@ import * as rl from 'raylib'
 import { GameInputs } from './Game_Inputs'
 import { Player } from './Player'
 import { Scene } from './Scene'
+import { SceneManager } from './Scene_Manager'
+import { Trigger } from './Trigger'
 
 export class GameManager {
     private static instance: GameManager
@@ -16,6 +18,7 @@ export class GameManager {
     }
 
     private game_inputs: GameInputs | null = null
+    private scene_manager: SceneManager | null = null
 
     private ANIMATION_UPDATE = 1 / 12
     private update_time = 0
@@ -24,7 +27,12 @@ export class GameManager {
     delta_time = 0
 
     player: Player | null = null
-    scene: Scene | null = null
+    rec: rl.Rectangle = {
+        x: 600,
+        y: 0,
+        width: 100,
+        height: 100
+    }
 
     init() {
         rl.InitWindow(1280, 720, "Lotus");
@@ -32,18 +40,48 @@ export class GameManager {
         // rl.ToggleFullscreen()
 
         this.game_inputs = GameInputs.get_instance()
+        this.scene_manager = SceneManager.get_instance()
 
-        this.player = new Player()
-        this.scene = new Scene({
+        this.scene_manager.add_scene("Home", new Scene({
             background: "assets/thanos.png",
             foreground: "assets/Raylib_logo.png",
             x: 0,
-            y: 0
-        })
+            y: 0,
+            objs: {
+                game_obj: [],
+                triggers: [
+                    new Trigger({
+                        x: 500,
+                        y: 0,
+                        width: 200,
+                        height: 100,
+                        behavior: {
+                            type: "change_scene",
+                            action: "Two"
+                        }
+                    })
+                ]
+            }
+        }))
+        this.scene_manager.add_scene("Two", new Scene({
+            background: "assets/Random.png",
+            foreground: "assets/dance-girl/hips.png",
+            x: 0,
+            y: 0,
+            objs: {
+                game_obj: [],
+                triggers: []
+            }
+        }))
+
+
+        this.scene_manager.current_scene = "Home"
+
+        this.player = new Player()
     }
 
     load_assets() {
-        this.scene?.load()
+        this.scene_manager?.load_scene()
     }
 
     private render() {
@@ -51,11 +89,9 @@ export class GameManager {
 
         rl.ClearBackground(rl.BLACK)
         
-        this.scene?.render_background()
+        this.scene_manager?.render_current_scene(this.player!)
 
-        this.player?.render()
-
-        // this.scene?.render_foreground()
+        rl.DrawRectangleRec(this.rec, rl.ColorAlpha(rl.WHITE, 0))
 
         rl.EndDrawing()
     }
@@ -76,6 +112,10 @@ export class GameManager {
         }
 
         this.player?.update()
+
+        if (rl.CheckCollisionRecs(this.rec, this.player!.get_rec())) {
+            this.scene_manager?.change_scene("Two")
+        }
     }
 
     game_loop() {
@@ -86,7 +126,7 @@ export class GameManager {
 
     close() {
         this.player?.unload()
-        this.scene?.unload()
+        this.scene_manager?.unload_scene()
 
         rl.CloseWindow()
     }

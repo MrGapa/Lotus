@@ -1,3 +1,4 @@
+import { Rectangle } from "raylib";
 import { GameObject } from "./Game_Object";
 import { Sprite } from "./Sprite";
 
@@ -16,6 +17,10 @@ export class Player extends GameObject {
             frames: 8,
             scale: 3.5
         })
+    }
+
+    get_rec(): Rectangle {
+        return this.sprite.get_dest(this.x, this.y)
     }
 
     unload(): void {

@@ -1,10 +1,19 @@
 import { DrawTexture, LoadTexture, Texture2D, UnloadTexture, WHITE } from "raylib";
+import { GameObject } from "./Game_Object";
+import { Trigger } from "./Trigger";
 
 interface SceneConfig {
     background: string
     foreground: string
     x: number
     y: number
+    objs: DifObjects
+}
+
+// * I didn´t have a better name for this
+interface DifObjects {
+    game_obj: GameObject[],
+    triggers: Trigger[]
 }
 
 export class Scene {
@@ -16,16 +25,19 @@ export class Scene {
     private x: number
     private y: number
 
+    objs: DifObjects 
+        
     private values: {
         background: string,
         foreground: string
     }
 
-    constructor({ background, foreground, x, y }: SceneConfig) {
+    constructor({ background, foreground, x, y, objs }: SceneConfig) {
         this.x = x
         this.y = y
 
         this.values = { background, foreground }
+        this.objs = objs
     }
 
     load() {
