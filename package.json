@@ -7,15 +7,20 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "archiver": "^5.3.1",
-    "module-alias": "^2.2.2",
-    "pkg": "^5.7.0",
     "raylib": "^0.9.1",
     "typescript": "^4.6.4"
   },
   "scripts": {
     "start": "node dist",
-    "dev": "tsc && yarn start"
+    "prestart": "npm run build",
+    "dev": "npm run build && npm run start",
+    "build": "tsc",
+    "prepkg": "npm i --no-save pkg",
+    "pkg": "pkg package.json"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.14.4"
   },
   "pkg": {
     "scripts": [
