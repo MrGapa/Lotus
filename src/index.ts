@@ -1,26 +1,15 @@
-import {
-    InitWindow,
-    SetTargetFPS,
-    BeginDrawing,
-    EndDrawing,
-    WindowShouldClose,
-    CloseWindow,
-    ClearBackground,
-    BLACK,
-    DrawText,
-    GOLD
-} from 'raylib'
+import { GameManager } from "./Game_Manager"
 
-InitWindow(1280, 720, "Lotus")
-SetTargetFPS(60)
+const Game = GameManager.get_instance()
 
-while (!WindowShouldClose()) {
-    BeginDrawing()
+Game.init()
 
-    ClearBackground(BLACK)
-    DrawText("HELLO", 640, 360, 20, GOLD)
+Game.load_assets()
 
-    EndDrawing()
+while (!Game.should_close) {
+    Game.game_loop()
 }
 
-CloseWindow()
+Game.close()
+
+// TODO Figure out how to package all of this
