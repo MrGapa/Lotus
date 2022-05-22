@@ -7,7 +7,9 @@ interface SceneMap {
 
 export class SceneManager {
     private static instance: SceneManager
-    private constructor() { }
+    private constructor() { 
+        this.player = new Player()
+    }
     public static get_instance(): SceneManager {
         if (!SceneManager.instance) {
             SceneManager.instance = new SceneManager()
@@ -19,6 +21,8 @@ export class SceneManager {
     current_scene = ""
     scene_map: SceneMap = {}
 
+    player: Player
+
     private get_current_scene(): Scene {
         return this.scene_map[this.current_scene]
     }
@@ -28,9 +32,7 @@ export class SceneManager {
     }
 
     change_scene(scene_name: string) {
-        let current = this.get_current_scene()
-
-        current.unload()
+        this.unload_scene()
 
         this.current_scene = scene_name
 
@@ -45,15 +47,19 @@ export class SceneManager {
         this.get_current_scene().unload()
     }
 
-    update(player: Player) {
+    animate_objects() {
+        this.player.sprite.animate()
+    }
+
+    update() {
         let { objs } = this.get_current_scene()
         
         objs.triggers.forEach(trg => {
-            trg.check_collision(player.get_rec())
+            trg.check_collision(this.player.get_rec())
         })
     }
 
-    render_current_scene(player: Player) {
+    render_current_scene() {
         let curr = this.get_current_scene()
 
         let { game_obj, triggers } = curr.objs
@@ -63,12 +69,17 @@ export class SceneManager {
             obj.render()
         })
 
-        player.render()
+        this.player.render()
 
         triggers.forEach(trg => {
             trg.render()
         })
 
         curr.render_foreground()
+    }
+
+    close() {
+        this.unload_scene()
+        this.player.unload()
     }
 }

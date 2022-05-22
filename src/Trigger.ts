@@ -1,5 +1,6 @@
-import { CheckCollisionRecs, Rectangle } from "raylib";
+import { CheckCollisionRecs, ColorAlpha, DrawRectangleRec, Rectangle, WHITE } from "raylib";
 import { GameObject } from "./Game_Object";
+import { SceneManager } from "./Scene_Manager";
 
 interface TriggerBehaivior {
     type: string
@@ -18,7 +19,7 @@ export class Trigger extends GameObject {
 
     private width: number
     private height: number
-    private behaivor: TriggerBehaivior
+    private trg_behavior: TriggerBehaivior
 
     activated: boolean = false
 
@@ -28,7 +29,7 @@ export class Trigger extends GameObject {
         this.width = width
         this.height = height
 
-        this.behaivor = behavior
+        this.trg_behavior = behavior
     }
 
     private get_rec(): Rectangle {
@@ -41,20 +42,21 @@ export class Trigger extends GameObject {
     }
 
     private behavior() {
-
+        (<any>this)[this.trg_behavior.type](this.trg_behavior.action)
     }
 
-    chnage_scene() {
-        
+    change_scene(scene: string) {
+        SceneManager.get_instance().change_scene(scene)
     }
 
     check_collision(other: Rectangle) {
         if (CheckCollisionRecs(this.get_rec(), other) && !this.activated) {
             this.activated = true
+            this.behavior()
         }
     }
 
     render() {
-
+        DrawRectangleRec(this.get_rec(), ColorAlpha(WHITE, 0))
     }
 }

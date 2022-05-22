@@ -3,11 +3,19 @@ import { GameObject } from "./Game_Object";
 import { Trigger } from "./Trigger";
 
 interface SceneConfig {
-    background: string
-    foreground: string
-    x: number
-    y: number
-    objs: DifObjects
+    background?: string
+    foreground?: string
+    x?: number
+    y?: number
+    objs?: DifObjects
+    scene_type?: SceneType,
+    has_gui?: boolean 
+}
+
+export enum SceneType {
+    CUTSCENE,
+    GAMEPLAY,
+    MENU
 }
 
 // * I didn´t have a better name for this
@@ -33,11 +41,17 @@ export class Scene {
     }
 
     constructor({ background, foreground, x, y, objs }: SceneConfig) {
-        this.x = x
-        this.y = y
+        this.x = x || 0
+        this.y = y || 0
 
-        this.values = { background, foreground }
-        this.objs = objs
+        this.values = {
+            background: background || '',
+            foreground: foreground || ''
+        }
+        this.objs = objs || {
+            game_obj: [],
+            triggers: []
+        }
     }
 
     load() {
@@ -46,13 +60,15 @@ export class Scene {
         this.background = LoadTexture(background)
         this.foreground = LoadTexture(foreground)
 
-        this.is_loaded = false
+        this.is_loaded = true
     }
 
     unload() {
         if (this.is_loaded) {
             UnloadTexture(this.background!)
             UnloadTexture(this.foreground!)
+
+            this.is_loaded = false
         }
     }
 
